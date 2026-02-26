@@ -38,8 +38,8 @@ dependencies {
 	modImplementation include("net.kyrptonaught:kyrptconfig:1.5.4-1.20") { exclude group: "net.fabricmc.fabric-api" }
 
 	//update modmenu when kyrptconfig is pulling old version
-	modImplementation ("com.terraformersmc:modmenu:9.2.0") { exclude group: "net.fabricmc.fabric-api" }
-
+	modImplementation ("com.terraformersmc:modmenu:16.0.0") { exclude group: "net.fabricmc.fabric-api" }
+	modImplementation "net.fabricmc.fabric-api:fabric-screen-api-v1:${fabric_api_version}"
 	//shulkerutils
 	modImplementation 'net.kyrptonaught:shulkerutils:1.0.4-1.19'
 	include 'net.kyrptonaught:shulkerutils:1.0.4-1.19'
