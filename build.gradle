@@ -1,0 +1,81 @@
+plugins {
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'maven-publish'
+}
+
+base {
+	archivesName = project.archives_base_name
+}
+
+version = project.mod_version
+group = project.maven_group
+
+
+loom {
+	accessWidenerPath = file("src/main/resources/quickshulker.accesswidener")
+}
+
+repositories {
+	maven { url 'https://maven.aliyun.com/repository/public/' }
+	maven { url 'https://maven.aliyun.com/repository/gradle-plugin/' }
+
+	maven { url 'https://maven.fabricmc.net' }
+	maven { url 'https://maven.kyrptonaught.dev' }
+	maven { url "https://maven.terraformersmc.com/" }
+	maven {
+		url "https://maven.nucleoid.xyz/"
+		name = "Nucleoid" // 可选：给仓库命名，方便排查问题
+		allowInsecureProtocol = true
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	modImplementation include("net.kyrptonaught:kyrptconfig:1.5.4-1.20") { exclude group: "net.fabricmc.fabric-api" }
+
+	//update modmenu when kyrptconfig is pulling old version
+	modImplementation ("com.terraformersmc:modmenu:9.2.0") { exclude group: "net.fabricmc.fabric-api" }
+
+	//shulkerutils
+	modImplementation 'net.kyrptonaught:shulkerutils:1.0.4-1.19'
+	include 'net.kyrptonaught:shulkerutils:1.0.4-1.19'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 17
+}
+
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${project.archives_base_name}" }
+	}
+}
+
+// configure the maven publication
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			artifactId = project.archives_base_name
+			from components.java
+		}
+	}
+	repositories {
+		maven {
+			url ='s3://maven.kyrptonaught.dev'
+			credentials(AwsCredentials) {
+				accessKey = System.getenv('maven-key-id')
+				secretKey = System.getenv('maven-key')
+			}
+		}
+	}
+}
